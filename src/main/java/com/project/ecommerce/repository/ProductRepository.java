@@ -12,4 +12,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.price > :price")
     List<Product> findProductsCostlier(BigDecimal price);
 
+    @Query("SELECT p FROM Product p WHERE p.name = :name")
+    List<Product> findProductByName(String name);
+
 }

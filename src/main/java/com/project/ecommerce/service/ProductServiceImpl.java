@@ -1,12 +1,17 @@
 package com.project.ecommerce.service;
 
+import com.project.ecommerce.dto.ProductRequestDTO;
 import com.project.ecommerce.entity.Product;
 import com.project.ecommerce.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -16,10 +21,9 @@ public class ProductServiceImpl implements ProductService{
         this.productRepository = productRepository;
     }
 
+
     @Override
     public Product addProduct(Product product) {
-        product.setCreatedAt(LocalDateTime.now());
-        product.setUpdatedAt(LocalDateTime.now());
         return productRepository.save(product);
     }
 
@@ -35,7 +39,25 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        try{
+            Optional<Product> optionalProduct = productRepository.findById(id);
+            if(optionalProduct.isEmpty()) {
+                throw new RuntimeException("Product not found with id: "+id);
+            }
+            return optionalProduct.get();
+        } catch(Exception ex) {
+            throw ex;
+        }
+    }
+    @Override
+    public List<Product> getProductByName(String name){
+        return productRepository.findProductByName(name);
+    }
+
+    @Override
+    public Page<Product> getProductsByPagination(Pageable pageable){
+        return productRepository.findAll(pageable);
     }
 
     @Override
@@ -51,6 +73,8 @@ public class ProductServiceImpl implements ProductService{
 
         return productRepository.save(existingRecord);
     }
+
+
 
     @Override
     public void deleteProductById(Long id) {
